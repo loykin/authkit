@@ -49,3 +49,43 @@ jobs:
           name: dist
           path: dist/
           if-no-files-found: error
+
+  deploy-playground:
+    name: Deploy Playground
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build playground
+        run: VITE_BASE_PATH=/authkit/ pnpm --filter authkit-playground build
+
+      - name: Add GitHub Pages SPA fallback
+        run: cp playground/dist/index.html playground/dist/404.html
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: playground/dist
+          keep_files: true
+          commit_message: "chore(ci): deploy playground"

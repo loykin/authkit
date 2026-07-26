@@ -86,6 +86,13 @@ export function RealBackendDemo() {
         Backed by a real Node server at {API_BASE} (see <code>playground/server/index.mjs</code>).
         Session is an httpOnly cookie — Phase 1/2 code runs against real HTTP.
       </p>
+      {import.meta.env.PROD && (
+        <p className="error">
+          This tab needs that server running locally — it won&apos;t work on a static deploy.
+          Clone the repo and run <code>pnpm server</code> in <code>playground/</code>, or use the
+          Mock manager tab above.
+        </p>
+      )}
       <LoginForm />
       <FetchDemo />
       <AuthPanel />

@@ -3,7 +3,9 @@ import { RealBackendDemo } from './RealBackendDemo'
 import { MockDemo } from './MockDemo'
 
 export function App() {
-  const [tab, setTab] = useState<'real' | 'mock'>('real')
+  // On a static deploy (e.g. GitHub Pages) there is no local fake backend to
+  // talk to, so default to the tab that works with no network at all.
+  const [tab, setTab] = useState<'real' | 'mock'>(import.meta.env.PROD ? 'mock' : 'real')
 
   return (
     <main>
