@@ -5,9 +5,6 @@ does not issue sessions, store users, or run an OAuth2/OIDC flow — it connects
 to your **existing** backend's login/session/refresh/permission API and turns
 that into a single, consistent state layer your app can render against.
 
-See [DESIGN.md](./DESIGN.md) for the full design rationale; this README is the
-practical entry point.
-
 ---
 
 ## When to use
@@ -24,8 +21,12 @@ practical entry point.
   (CASL, Casbin.js, a remote PDP) hardcoded into the library.
 
 If you want a library that also issues/owns sessions (NextAuth-style), or a
-full IdP, authkit is not that — see [DESIGN.md §21](./DESIGN.md#21-유사-사례-검토)
-for why that's a deliberate non-goal.
+full IdP, authkit is not that. Libraries that own session issuance can offer a
+zero-backend quickstart because there's no unknown backend to adapt to — but
+that means adopting their session/token format instead of the one your
+existing backend already speaks. Authkit deliberately stays on the other side
+of that trade-off: no owned session format, no bundled login UI, no assumed
+protocol — only adapters around whatever your backend already does.
 
 ---
 
@@ -166,10 +167,16 @@ const auth = createMockAuthManager({
 
 ## Status
 
-Phase 1–4 of the [DESIGN.md §18](./DESIGN.md#18-구현-단계) roadmap are
-implemented and tested: Core, HTTP (auth-aware fetch, refresh single-flight,
-CSRF), React bindings, and the mock/testing runtime. Phase 5 (wiring this into
-a real consuming app) happens in that app's own repo, not here.
+Implemented and tested:
+
+- **Core** — `createAuthManager()`, state/events, session lifecycle, key-based
+  permission authorizer
+- **HTTP** — auth-aware `fetch()`, refresh single-flight, 401 retry, request
+  replay, CSRF strategy
+- **React** — `AuthProvider`, hooks, `<CanAuth>`/`<Authenticated>`/`<Anonymous>`
+- **Testing** — `createMockAuthManager()`, scenarios, refresh/permission mocking
+
+Wiring this into a specific consuming app is out of scope for this repo.
 
 ## Playground
 
